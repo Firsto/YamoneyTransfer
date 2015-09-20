@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="ru.firsto.yamoneytranfer.MainActivity"
+    tools:ignore="MergeRootFrame">
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_widget_spacing"
+        android:text="Authorize to send money"
+        android:id="@+id/auth_button"/>
+
+
+    <RelativeLayout
+        android:id="@+id/account_info"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/account"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Account: not authorized"/>
+
+        <TextView
+            android:id="@+id/account_balance"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Balance: not authorized"
+            android:layout_below="@id/account"/>
+
+        <EditText
+            android:id="@+id/payee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_widget_spacing"
+            android:inputType="phone"
+            android:hint="@string/activity_pay_account_hint"
+            android:layout_below="@id/account_balance"/>
+
+        <EditText
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_widget_spacing"
+            android:inputType="numberDecimal"
+            android:hint="@string/activity_pay_amount_hint"
+            android:layout_below="@id/payee"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_widget_spacing"
+            android:text="Request Payment"
+            android:id="@+id/request_payment"
+            android:layout_below="@id/amount"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/revoke_auth"
+            android:text="Revoke authorization"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
