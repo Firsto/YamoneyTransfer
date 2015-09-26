@@ -8,9 +8,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,21 +45,28 @@ public class MainActivity extends Activity {
 
     public static final String ACC_MINE = "41001158150802";
     public static final String ACC_COLIPASS = "410013069217129";
+    public static final String FIRST_START = "first_start";
 
     private OAuth2Session mSession = new OAuth2Session(new DefaultApiClient(CLIENT_ID));
     private AccountInfo mAccountInfo;
 
     SharedPreferences mPreferences;
+    SecurePreferences mSecurePreferences;
 
+    private Button btnAuth;
+    private RelativeLayout account;
     private TextView tvAccount, tvBalance;
-    private EditText etPayee, etAmount;
+    private EditText etPayee, etAmount, etAmountDue, etMessage, etExpiration;
+    private CheckBox chbProtection;
+    private String mPin;
+    private int mPinAttempt = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btnAuth = findButton(R.id.auth_button);
+        btnAuth = findButton(R.id.auth_button);
         btnAuth.setClickable(true);
         btnAuth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,20 +92,132 @@ public class MainActivity extends Activity {
             }
         });
 
-        RelativeLayout account = (RelativeLayout) findViewById(R.id.account_info);
+        account = (RelativeLayout) findViewById(R.id.account_info);
+
+        btnAuth.setVisibility(View.INVISIBLE);
+        account.setVisibility(View.INVISIBLE);
 
         tvAccount = findTextView(R.id.account);
         tvBalance = findTextView(R.id.account_balance);
 
         etPayee = findEditText(R.id.payee);
         etAmount = findEditText(R.id.amount);
+        etAmountDue = findEditText(R.id.amount_due);
+        etMessage = findEditText(R.id.comment);
+        etExpiration = findEditText(R.id.expiration);
+
+        chbProtection = (CheckBox) findViewById(R.id.protection);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!mPreferences.getBoolean(FIRST_START, true)) {
+            showPinDialog("Enter Pin to access:", false);
+        } else {
+            showPinDialog("Create Pin to encrypt your access token (4-6 digits):", true);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        showPinDialog("Enter Pin to access:");
+    }
+
+    private void showPinDialog(String message, final boolean check) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Secret area");
+        alert.setMessage(message);
+        alert.setCancelable(false);
+
+        View dialogView = this.getLayoutInflater().inflate(R.layout.field_pin, null);
+        final EditText input = (EditText) dialogView.findViewById(R.id.field_pin);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        final EditText inputCheck = (EditText) dialogView.findViewById(R.id.field_pin_check);
+        if (check) {
+            inputCheck.setInputType(InputType.TYPE_CLASS_NUMBER);
+            inputCheck.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            inputCheck.setVisibility(View.VISIBLE);
+        }
+        alert.setView(dialogView);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                mPin = input.getText().toString();
+                mSecurePreferences = new SecurePreferences(MainActivity.this, "secret", mPin, true);
+                if (check) {
+                    mPreferences.edit().putBoolean(FIRST_START, false).apply();
+                    mSecurePreferences.put("pin_check", "checked");
+                }
+                init();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        final AlertDialog dialog = alert.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (check) {
+                    if (s.toString().equals(inputCheck.getText().toString())) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(!TextUtils.isEmpty(s) && s.length() > 3);
+                    else dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                } else {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(!TextUtils.isEmpty(s) && s.length() > 3);
+                }
+            }
+        });
+
+        if (check) {
+            inputCheck.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (s.toString().equals(input.getText().toString())) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(!TextUtils.isEmpty(s) && s.length() > 3);
+                    else dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            });
+        }
+    }
+
+    private void init() {
         String token;
-        if ((token = mPreferences.getString("token", null)) != null) {
+        if ((token = mSecurePreferences.getString("token")) != null) {
             btnAuth.setVisibility(View.GONE);
             account.setVisibility(View.VISIBLE);
             getAccountInfo(token);
+        } else if (!mSecurePreferences.containsKey("pin_check")) {
+            if (mPinAttempt == 0) {
+                mPreferences.edit().clear().apply();
+                mSecurePreferences.clear();
+                finish();
+            }
+            showPinDialog("Enter correct Pin (" + mPinAttempt-- + " attempts remaining):", false);
         } else {
             btnAuth.setVisibility(View.VISIBLE);
             account.setVisibility(View.GONE);
@@ -157,17 +281,29 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, "Error. Token invalid or was already revoked", Toast.LENGTH_LONG).show();
             }
             mPreferences.edit().clear().apply();
+            mSecurePreferences.clear();
             refresh();
         }
     }
 
     private class PaymentTask extends AsyncTask<Void, Void, ProcessPayment> {
 
+        private boolean isCodePro = false;
+        private String mComment = "Comment was not specified";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            isCodePro = chbProtection.isChecked();
+            String message = etMessage.getText().toString();
+            if (!TextUtils.isEmpty(message)) mComment = message;
+        }
+
         @Override
         protected ProcessPayment doInBackground(Void... params) {
 
             P2pTransferParams transferParams = new P2pTransferParams.Builder(getPayee())
-                    .setAmount(getAmount())
+                    .setAmount(getAmount()).setCodepro(isCodePro).setComment(mComment).setMessage(mComment)
                     .build();
 //            transferParams.paymentParams.put("test_payment", "true");
 //            transferParams.paymentParams.put("test_card", "available");
@@ -199,7 +335,7 @@ public class MainActivity extends Activity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            getAccountInfo(mPreferences.getString("token", null));
+                            getAccountInfo(mSecurePreferences.getString("token"));
                         }
                     });
 
@@ -217,7 +353,7 @@ public class MainActivity extends Activity {
         switch (resultCode) {
             case RESULT_OK:
                 String token = data.getStringExtra("token");
-                mPreferences.edit().putString("token", token).apply();
+                mSecurePreferences.put("token", token);
                 getAccountInfo(token);
                 refresh();
                 break;
@@ -231,9 +367,11 @@ public class MainActivity extends Activity {
     private Button findButton(int id) {
         return (Button) findViewById(id);
     }
+
     private TextView findTextView(int id) {
         return (TextView) findViewById(id);
     }
+
     private EditText findEditText(int id) {
         return (EditText) findViewById(id);
     }

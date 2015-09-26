@@ -39,18 +39,69 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_widget_spacing"
-            android:inputType="phone"
+            android:inputType="number"
             android:hint="@string/activity_pay_account_hint"
             android:layout_below="@id/account_balance"/>
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/payee"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/payee"
+            android:orientation="horizontal"
+            android:id="@+id/sum">
+
+            <EditText
+                android:id="@+id/amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_widget_spacing"
+                android:inputType="numberDecimal"
+                android:hint="@string/activity_pay_amount_hint"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/amount_due"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_widget_spacing"
+                android:inputType="numberDecimal"
+                android:hint="@string/activity_pay_amount_due_hint"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
         <EditText
-            android:id="@+id/amount"
+            android:id="@+id/comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_widget_spacing"
-            android:inputType="numberDecimal"
-            android:hint="@string/activity_pay_amount_hint"
-            android:layout_below="@id/payee"/>
+            android:inputType="text"
+            android:hint="@string/activity_pay_comment_hint"
+            android:layout_below="@id/sum"/>
+
+
+        <CheckBox
+            android:id="@+id/protection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_widget_spacing"
+            android:text="Add protection code"
+            android:layout_below="@id/comment"/>
+
+        <EditText
+            android:id="@+id/expiration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_widget_spacing"
+            android:inputType="phone"
+            android:hint="@string/activity_pay_expiration_hint"
+            android:layout_below="@id/comment"
+            android:layout_alignParentRight="true"/>
 
         <Button
             android:layout_width="match_parent"
@@ -58,7 +109,7 @@
             android:layout_marginTop="@dimen/layout_widget_spacing"
             android:text="Request Payment"
             android:id="@+id/request_payment"
-            android:layout_below="@id/amount"/>
+            android:layout_below="@id/protection"/>
 
         <Button
             android:layout_width="match_parent"
