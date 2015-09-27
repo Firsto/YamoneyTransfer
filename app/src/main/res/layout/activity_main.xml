@@ -56,6 +56,15 @@
             android:id="@+id/sum">
 
             <EditText
+                android:id="@+id/amount_due"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_widget_spacing"
+                android:inputType="numberDecimal"
+                android:hint="@string/activity_pay_amount_due_hint"
+                android:layout_weight="1"/>
+
+            <EditText
                 android:id="@+id/amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,14 +73,6 @@
                 android:hint="@string/activity_pay_amount_hint"
                 android:layout_weight="1"/>
 
-            <EditText
-                android:id="@+id/amount_due"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_widget_spacing"
-                android:inputType="numberDecimal"
-                android:hint="@string/activity_pay_amount_due_hint"
-                android:layout_weight="1"/>
 
         </LinearLayout>
 
@@ -98,25 +99,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_widget_spacing"
-            android:inputType="phone"
+            android:inputType="number"
+            android:maxLength="3"
             android:hint="@string/activity_pay_expiration_hint"
             android:layout_below="@id/comment"
             android:layout_alignParentRight="true"/>
 
         <Button
+            android:id="@+id/request_payment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_widget_spacing"
             android:text="Request Payment"
-            android:id="@+id/request_payment"
             android:layout_below="@id/protection"/>
 
+        <TextView
+            android:id="@+id/operations_list_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/request_payment"
+            android:text="Last 30 operations"
+            android:textSize="18sp"
+            android:paddingTop="8dp"
+            android:layout_centerHorizontal="true"/>
+
         <Button
+            android:id="@+id/revoke_auth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/revoke_auth"
             android:text="Revoke authorization"
             android:layout_alignParentBottom="true"/>
+        <ListView
+            android:id="@+id/operation_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/operations_list_title"
+            android:layout_above="@id/revoke_auth"/>
+
 
     </RelativeLayout>
 

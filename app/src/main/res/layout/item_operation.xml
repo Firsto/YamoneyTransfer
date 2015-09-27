@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout android:id="@+id/operation_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/operation_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="2015-09-20 16:22:15"
+            android:maxWidth="92dp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/operation_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="Перевод на счет 410013069217129"
+            android:maxWidth="240dp"
+            android:maxLines="2"
+            android:layout_toRightOf="@id/operation_date"/>
+
+        <TextView
+            android:id="@+id/operation_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="- 1000,00 Р"
+            android:textSize="18sp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout android:id="@+id/operation_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="92dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/operation_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comment: some comment some money some transfer and little words more..."
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/operation_protection_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Protection code: none"
+            android:textColor="@android:color/darker_gray"/>
+
+
+    </LinearLayout>
+
+</LinearLayout>

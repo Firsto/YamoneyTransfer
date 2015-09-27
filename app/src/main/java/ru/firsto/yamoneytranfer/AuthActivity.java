@@ -138,7 +138,7 @@ public class AuthActivity extends Activity {
                     .add("client_id", CLIENT_ID)
                     .add("response_type", "code")
                     .add("redirect_uri", REDIRECT_URL)
-                    .add("scope", "account-info operation-history payment-p2p.limit(1,10)")
+                    .add("scope", "account-info operation-history operation-details payment-p2p.limit(1,10)")
                     .build();
             Request request = new Request.Builder()
                     .url("https://m.money.yandex.ru/oauth/authorize")
